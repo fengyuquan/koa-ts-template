@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --watch src/**/*.ts --exec ts-node src/index.ts",
     "prod": "cross-env NODE_ENV=production node dist/index.js",
-    "build": "rimraf dist && tsc -p tsconfig.json",
+    "build": "rimraf dist && babel src --out-dir dist --extensions \".ts\"",
     "build:release": "rimraf dist && tsc -p tsconfig.release.json",
     "compile-check": "tsc --pretty --noEmit",
     "lint": "eslint --fix ./src/** --ext .js,.jsx,.ts,.tsx",

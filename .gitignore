@@ -30,3 +30,6 @@ build/
 # Misc
 .DS_Store
 .eslintcache
+
+# secure config
+src/config/secure.ts
