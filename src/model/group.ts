@@ -6,6 +6,7 @@ class Group extends Model {
   declare id: number
   declare name: string
   declare info: string
+  declare level: number
 
   toJSON() {
     const origin = {

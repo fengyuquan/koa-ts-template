@@ -1,13 +1,13 @@
 import { DataTypes, Model } from 'sequelize'
 import sequelize from '../core/db'
 
-class GroupPermission extends Model {
+class UserGroup extends Model {
   declare id: number
   declare group_id: number
-  declare permission_id: number
+  declare user_id: number
 }
 
-GroupPermission.init(
+UserGroup.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -19,25 +19,25 @@ GroupPermission.init(
       allowNull: false,
       comment: '分组id'
     },
-    permission_id: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      comment: '权限id'
+      comment: '用户id'
     }
   },
   {
     sequelize,
     timestamps: false,
-    tableName: 'sys_group_permission',
-    modelName: 'group_permission',
+    tableName: 'sys_user_group',
+    modelName: 'user_group',
     indexes: [
       {
-        name: 'group_id_permission_id',
+        name: 'user_id_group_id',
         using: 'BTREE',
-        fields: ['group_id', 'permission_id']
+        fields: ['user_id', 'group_id']
       }
     ]
   }
 )
 
-export { GroupPermission as GroupPermissionModel }
+export { UserGroup as UserGroupModel }
