@@ -8,6 +8,7 @@ import { GroupPermissionModel } from '../model/group-permission'
 import { PermissionModel } from '../model/permission'
 import { UserModel } from '../model/user'
 import { UserGroupModel } from '../model/user-group'
+import {isRootAdmin} from '../utils'
 
 class AdminDao {
   /**
@@ -218,9 +219,7 @@ class AdminDao {
     if (!user) {
       // TODO 没有找到用户，抛出错误
     } else {
-      const isRootAdmin = await this.isRootAdmin(id)
-
-      if (isRootAdmin) {
+      if (await isRootAdmin(id)) {
         // TODO 如果是超级管理员, 抛出不能删除超级管理员的错误
       } else {
         // 开启事务，删除 用户，用户-组 中的条目
@@ -259,9 +258,7 @@ class AdminDao {
       // TODO 没有找到用户，抛出错误
     } else {
       // 判断他是否是超级管理员
-      const isRootAdmin = await this.isRootAdmin(id)
-
-      if (isRootAdmin) {
+      if (await isRootAdmin(id)) {
         // TODO 如果是超级管理员, 抛出不能删除超级管理员的错误
       } else {
         // 2.1 先判断传递过来的groupIds是否全部存在数据库中，并且还不能是超级管理员组
@@ -344,33 +341,6 @@ class AdminDao {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async updateGroupPermission(groupId: number, permissionIds: number[]) {
     // TODO
-  }
-
-  /**
-   * 判断操作的用户是否是超级管理员
-   * 超级管理员只属于root这一个组
-   */
-  private async isRootAdmin(userId: number) {
-    // 如果是超级管理员，则不允许删除
-    const userGroup = await UserGroupModel.findOne({
-      where: {
-        user_id: userId
-      }
-    })
-    if (!userGroup) {
-      // TODO 抛出找不到该用户组
-      throw new Error('找不到')
-    }
-    const group = await GroupModel.findByPk(userGroup.group_id)
-    if (!group) {
-      // TODO 抛出找不到该用户组
-      throw new Error('找不到')
-    }
-    if (group.level === GroupLevel.Root) {
-      return true
-    } else {
-      return false
-    }
   }
 }
 
