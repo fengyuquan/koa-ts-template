@@ -1,14 +1,60 @@
+import jwt, { JsonWebTokenError, JwtPayload } from 'jsonwebtoken'
+import config from '../config'
+import { AuthFailed, Forbidden, NotFound, UnAuthenticated } from '../exception'
 import { IUserContext } from '../lib/interface'
 import { GroupLevel } from '../lib/type'
 import { GroupModel } from '../model/group'
 import { UserModel } from '../model/user'
 import { UserGroupModel } from '../model/user-group'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function generateToken(uid: number) {
+  const { secretKey, expiresIn } = config.security
+
+  return jwt.sign(
+    {
+      uid
+    },
+    secretKey,
+    {
+      expiresIn
+    }
+  )
+}
+
 function getIdFromToken(ctx: IUserContext) {
-  // TODO 从上下文中拿到token，并解析token，返回用户的id
-  const id = 1
-  return id
+  let decode: JwtPayload | string
+
+  if (!ctx.header?.authorization) {
+    throw new UnAuthenticated(20007) // 未携带token访问
+  }
+
+  const parts = ctx.header.authorization.split(' ')
+  if (parts.length === 2) {
+    // Bearer 字段
+    const scheme = parts[0]
+    // token 字段
+    const token = parts[1]
+
+    if (/^Bearer$/i.test(scheme)) {
+      if (!token) {
+        throw new UnAuthenticated(20007) // 未携带token访问
+      }
+      try {
+        decode = jwt.verify(token, config.security.secretKey)
+      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((error as JsonWebTokenError).name == 'TokenExpiredError') {
+          throw new UnAuthenticated(20004) // 令牌已过期
+        }
+        throw new UnAuthenticated(20003) // 令牌失效或损坏
+      }
+    } else {
+      throw new AuthFailed(20008) // 认证头字段解析失败
+    }
+  } else {
+    throw new AuthFailed(20008)
+  }
+  return (decode as JwtPayload).uid
 }
 
 /**
@@ -18,8 +64,7 @@ async function mountUser(ctx: IUserContext) {
   const id = getIdFromToken(ctx)
   const user = await UserModel.findByPk(id)
   if (!user) {
-    // TODO 抛出用户不存在的错误
-    throw new Error('用户不存在')
+    throw new AuthFailed(20005)
   }
 
   // 将user挂在ctx上
@@ -37,13 +82,11 @@ async function isRootAdmin(userId: number) {
     }
   })
   if (!userGroup) {
-    // TODO 抛出找不到该用户用户所属的组
-    throw new Error('找不到')
+    throw new Forbidden(40001) // 用户还没有分配组，请联系管理员分配
   }
   const group = await GroupModel.findByPk(userGroup.group_id)
   if (!group) {
-    // TODO 抛出找不到该用户组
-    throw new Error('找不到')
+    throw new NotFound(40002) // 用户所在组不存在，请联系管理员
   }
   if (group.level === GroupLevel.Root) {
     return true
@@ -52,4 +95,4 @@ async function isRootAdmin(userId: number) {
   }
 }
 
-export { mountUser, isRootAdmin }
+export { mountUser, isRootAdmin, generateToken }

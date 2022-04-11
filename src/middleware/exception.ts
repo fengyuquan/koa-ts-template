@@ -1,11 +1,13 @@
 import { Next } from 'koa'
 import { IRouterContext } from 'koa-router'
+import config from '../config'
 import {
   HttpException,
   ParameterException,
   WrongUrlException
 } from '../exception'
 import codes from '../exception/exception-code'
+import { logger } from './logger'
 
 const catchError = async (ctx: IRouterContext, next: Next) => {
   try {
@@ -29,6 +31,10 @@ const catchError = async (ctx: IRouterContext, next: Next) => {
         request: `${ctx.method} ${ctx.path}`
       }
     } else {
+      // 未知错误
+      if (config.env === 'development') {
+        logger.error(error)
+      }
       ctx.status = 500
       ctx.body = {
         code: 9999,

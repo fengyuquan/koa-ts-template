@@ -1,5 +1,6 @@
 import { Next } from 'koa'
 import { Op } from 'sequelize'
+import { Forbidden } from '../exception'
 import { IUserContext } from '../lib/interface'
 import { routerMetaInfo } from '../lib/router'
 import { MountType } from '../lib/type'
@@ -22,8 +23,7 @@ async function adminRequired(ctx: IUserContext, next: Next) {
     if (await isRootAdmin((ctx.currentUser as UserModel).id)) {
       await next()
     } else {
-      // TODO抛出不是管理员没有权限操作
-      throw new Error('不是管理员没有权限操作')
+      throw new Forbidden(20002)
     }
   }
 }

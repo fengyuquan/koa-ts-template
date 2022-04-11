@@ -204,14 +204,6 @@ class AdminDao {
   }
 
   /**
-   * 创建用户
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async createUser(name: string) {
-    // TODO
-  }
-
-  /**
    * 禁用用户
    */
   async deleteUser(id: number) {

@@ -36,8 +36,8 @@ class Forbidden extends HttpException {
  * 资源找不到
  */
 class NotFound extends HttpException {
-  constructor() {
-    super(30001)
+  constructor(code = 30001) {
+    super(code)
     this.status = 404
   }
 }
@@ -54,11 +54,11 @@ class ParameterException extends HttpException {
 }
 
 /**
- * 认证失败
+ * 认证失败, 存在多个原因认证失败，所以传入code
  */
 class AuthFailed extends HttpException {
-  constructor() {
-    super(20001)
+  constructor(code = 20001) {
+    super(code)
     this.status = 401
   }
 }
@@ -67,8 +67,8 @@ class AuthFailed extends HttpException {
  * 用户未被授权
  */
 class UnAuthenticated extends HttpException {
-  constructor() {
-    super(20002)
+  constructor(code = 20002) {
+    super(code)
     this.status = 401
   }
 }

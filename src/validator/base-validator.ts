@@ -3,7 +3,7 @@ import { IRouterContext } from 'koa-router'
 import _ from 'lodash'
 import validator from 'validator'
 import { ParameterException } from '../exception'
-import { findMembers } from '../utils/helper'
+import { findMembers } from '../utils'
 
 /**
  * 自定义参数验证器，所有具体的参数验证器必须继承该类，并按照规定的格式书写成员
@@ -23,7 +23,10 @@ import { findMembers } from '../utils/helper'
  */
 class BaseValidator {
   params!: object
-  paramsChecked!: object
+  paramsChecked!: {
+    default?: any
+    [key: string]: any
+  }
   memberkeys!: string[];
 
   [key: string]: any
@@ -75,6 +78,31 @@ class BaseValidator {
     }
 
     return this
+  }
+
+  /**
+   * 获取已校验过的参数值, 或原始参数值
+   * @param path, 以"." 作为分隔符传入的路径，例如 a.b.c
+   * @param parsed, 表明是否是已处理过的对象，默认true
+   * @returns {string|any}
+   */
+  get(path: string, parsed = true) {
+    if (parsed) {
+      // _.get(object, path, [defaultValue]), https://www.lodashjs.com/docs/lodash.get
+      // 根据 object 对象的path路径获取值。 如果解析 value 是 undefined 会以 defaultValue 取代。
+      const value = _.get(this.paramsChecked, path, null)
+
+      if (!value) {
+        // _.last(array), 获取array中的最后一个元素。 https://www.lodashjs.com/docs/lodash.last
+        return _.get(
+          this.paramsChecked.default,
+          <string>_.last(path.split('.'))
+        )
+      }
+      return value
+    } else {
+      return _.get(this.params, path)
+    }
   }
 
   private async _check(key: string) {
@@ -141,7 +169,7 @@ class BaseValidator {
     return false
   }
 
-  _findParam(key: string) {
+  private _findParam(key: string) {
     let value
     value = _.get(this.params, ['query', key])
     if (value) {
@@ -183,10 +211,10 @@ class BaseValidator {
  */
 class Rule {
   name: string
-  message: string
+  message?: string
   options: any[]
 
-  constructor(name: string, message: string, ...options: any[]) {
+  constructor(name: string, message?: string, ...options: any[]) {
     this.name = name
     this.message = message
     this.options = options
@@ -198,6 +226,8 @@ class Rule {
       return new RuleResult(true)
     }
     // 调用validator.js 校验，不通过
+    console.log(_.get(validator, this.name))
+
     if (!_.get(validator, this.name)(value + '', ...this.options)) {
       return new RuleResult(false, this.message || '参数错误')
     }
