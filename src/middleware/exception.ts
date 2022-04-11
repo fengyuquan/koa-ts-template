@@ -19,7 +19,7 @@ const catchError = async (ctx: IRouterContext, next: Next) => {
       // 针对参数校验错误，它的message应该是由校验类传递过来的，不再通过查询codes配置文件获得
       let message = codes[error.code]
       if (error instanceof ParameterException && error.message) {
-        message = error.message
+        message = JSON.parse(error.message)
       }
 
       ctx.status = error.status
