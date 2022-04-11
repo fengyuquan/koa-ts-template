@@ -6,9 +6,17 @@ import koaStatic from 'koa-static'
 import path from 'path'
 import config from './config'
 import Init from './core/init'
+import catchError from './middleware/exception'
+import { loggerMiddleware } from './middleware/logger'
 
 // Init Koa instance
 const app = new koa()
+
+// Logger
+app.use(loggerMiddleware)
+
+// Error Handler
+app.use(catchError)
 
 // global middewares
 app.use(koaHelmet())

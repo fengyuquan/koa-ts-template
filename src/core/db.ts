@@ -8,8 +8,7 @@ const sequelize = new Sequelize(dbName, username, password, {
   host,
   port,
   timezone: '+08:00',
-  logging: console.log,
-  // logging: logger.info.bind(logger),
+  logging: config.env === 'development' ? console.log : false,
   define: {
     paranoid: true, // 不删除数据库条目,但将新添加的属性deletedAt设置为当前日期(删除完成时)
     underscored: true, // 将自动设置所有属性的字段参数为下划线命名方式

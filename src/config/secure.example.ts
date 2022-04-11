@@ -1,4 +1,8 @@
 export default {
+  log4j: {
+    logDir: '',
+    logName: 'default.log'
+  },
   database: {
     dbName: 'koa-ts-template',
     host: 'localhost',

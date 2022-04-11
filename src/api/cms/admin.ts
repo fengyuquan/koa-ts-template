@@ -1,4 +1,5 @@
 import { ParameterizedContext } from 'koa'
+import { UnAuthenticated } from '../../exception'
 import { PowerRouter } from '../../lib/router'
 
 const admin = new PowerRouter({
@@ -13,7 +14,10 @@ admin.powerGet(
   admin.permission('查询所有可分配的权限'),
   // adminRequired,
   async (ctx: ParameterizedContext) => {
-    ctx.body = '查询所有可分配的权限'
+    // ctx.body = '查询所有可分配的权限'
+    console.log(ctx.method)
+
+    throw new UnAuthenticated()
   }
 )
 
