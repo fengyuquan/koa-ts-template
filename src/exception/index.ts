@@ -18,7 +18,7 @@ class HttpException extends Error {
 class Success extends HttpException {
   constructor() {
     super(0)
-    this.status = 201
+    this.status = 200
   }
 }
 

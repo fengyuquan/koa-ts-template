@@ -1,7 +1,7 @@
 import UserDao from '../../dao/user'
 import { IUserContext } from '../../lib/interface'
 import { PowerRouter } from '../../lib/router'
-import { adminRequired } from '../../middleware/auth'
+import { adminRequired, loginRequired } from '../../middleware/auth'
 import {
   LoginValidator,
   RegisterValidator
@@ -24,9 +24,16 @@ user.powerGet(
 )
 
 /**
- * 用户登陆 使用用户名
+ * 获取用户信息
  */
-user.post('/login_name', async (ctx) => {
+user.get('/info', loginRequired, async (ctx) => {
+  ctx.success?.(ctx.currentUser)
+})
+
+/**
+ * 用户登陆 使用用户名或者邮箱
+ */
+user.post('/login', async (ctx) => {
   const v = await new LoginValidator(ctx).validate()
   const token = await UserDao.getToken(v)
   ctx.body = { token }
