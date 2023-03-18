@@ -1,7 +1,7 @@
 import { IRouterContext } from 'koa-router'
-import { Index, Rule } from './base-validator'
+import { BaseValidator, Rule } from './base-validator'
 
-class PositiveIntegerValidator extends Index {
+export class PositiveIntegerValidator extends BaseValidator {
   id: Rule[]
   id1: Rule[]
 
@@ -11,5 +11,3 @@ class PositiveIntegerValidator extends Index {
     this.id1 = [new Rule('isInt', '需要传入正整数', { min: 1 })]
   }
 }
-
-export { PositiveIntegerValidator }

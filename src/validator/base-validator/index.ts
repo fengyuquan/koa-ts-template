@@ -6,6 +6,10 @@ import { Rule } from './rule'
 import { createRuleFieldResult } from './rule-result'
 import { ValidateField } from './validate-field'
 
+export * from './rule'
+export * from './rule-result'
+export * from './validate-field'
+
 /**
  * 自定义参数验证器，所有具体的参数验证器(XxxValidator)必须继承该类，并按照规定的格式书写成员变量
  * 规则一：

@@ -8,7 +8,7 @@ import { createRuleResult, IRuleResult } from './rule-result'
  */
 export class Rule {
   name: string // 规则名称
-  message: string // 校验后的提示信息
+  message: string // 校验失败后的提示信息
   defaultValue: any // 如果设置name为isOptional，在校验value未传入时，使用该值，
   options?: {} // 剩余参数，给第三方库validator用的
 
