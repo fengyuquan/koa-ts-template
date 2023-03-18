@@ -3,7 +3,7 @@ import { AuthFailed, Forbidden } from '../exception'
 import { LoginType } from '../lib/enum'
 import { UserModel } from '../model/user'
 import { generateToken } from '../utils'
-import { BaseValidator } from '../validator/base-validator'
+import { Index } from '../validator/base-validator'
 import { RegisterValidator } from '../validator/user-validator'
 
 class UserDao {
@@ -36,12 +36,12 @@ class UserDao {
     })
   }
 
-  static async getToken(v: BaseValidator) {
+  static async getToken(v: Index) {
     const user = await UserDao._verifyEmailOrNamePassword(v)
     return generateToken(user.id)
   }
 
-  private static async _verifyEmailOrNamePassword(v: BaseValidator) {
+  private static async _verifyEmailOrNamePassword(v: Index) {
     // 判断是什么类型登陆
     const loginType = v.get('body.email') ? LoginType.Email : LoginType.Username
     let user

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IRouterContext } from 'koa-router'
 import { LoginType } from '../lib/enum'
-import { BaseValidator, Rule } from './base-validator'
+import { Index, Rule } from './base-validator'
 
-class RegisterValidator extends BaseValidator {
+class RegisterValidator extends Index {
   username
   email
   password
@@ -34,7 +34,7 @@ class RegisterValidator extends BaseValidator {
   }
 }
 
-class LoginValidator extends BaseValidator {
+class LoginValidator extends Index {
   username?: Rule[]
   email?: Rule[]
   password
