@@ -1,21 +1,43 @@
 import fs from 'fs'
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * 定义一个函数接口，用于查找对象中满足条件的key
+ */
 interface IFindFunc {
+  /**
+   * @param obj 函数接收要查找的对象
+   * @returns {string[]} 返回满足条件的key数组
+   */
   (obj: { [x: string]: any }): string[]
 }
 
+/**
+ * 定义一个函数接口，用于查找对象中满足条件的key
+ */
 interface IFindMembersFunc {
+  /**
+   * @param obj 要查找的对象
+   * @param options 查找条件
+   * @param options.filter 过滤条件函数
+   * @param options.prefix key的前缀
+   * @param options.specifiedType 指定的类型
+   * @returns {string[]} 返回满足条件的key数组
+   */
   (
     obj: { [x: string]: any },
     options: {
-      filter?: any
+      filter?: Function
       prefix?: string
       specifiedType?: any
     }
   ): string[]
 }
 
+/**
+ * 断言函数，如果ok为false，则抛出一个错误
+ * @param ok 断言条件
+ * @param args 错误信息
+ */
 function assert(ok: boolean, ...args: string[]): void {
   if (!ok) {
     throw new Error(args.join(' '))
@@ -23,8 +45,9 @@ function assert(ok: boolean, ...args: string[]): void {
 }
 
 /**
- * 获取文件夹下所有文件名
- * @param dir 文件夹
+ * 获取指定目录下的所有文件路径
+ * @param dir 目录路径
+ * @returns {string[]} 返回文件路径数组
  */
 function getFiles(dir: string) {
   let res: string[] = []
@@ -78,16 +101,11 @@ const findMembers: IFindMembersFunc = (
    * @returns {boolean}
    */
   function _shouldKeep(key: string) {
-    // 通过传入的filter，判断当前的值是否需要保留
-    if (filter && filter(key)) {
-      return true
-    }
-    if (prefix && key.startsWith(prefix)) {
-      return true
-    }
-    if (specifiedType && obj[key] instanceof specifiedType) {
-      return true
-    }
+    return (
+      (filter && filter(key)) ||
+      (prefix && key.startsWith(prefix)) ||
+      (specifiedType && obj[key] instanceof specifiedType)
+    )
   }
 
   return _find(obj)
