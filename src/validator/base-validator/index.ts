@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IRouterContext } from 'koa-router'
 import _ from 'lodash'
 import { ParameterException } from '../../exception'
@@ -43,15 +42,13 @@ export class BaseValidator {
    * 从ctx中找到所有前端传递过来的参数
    */
   private initParams(ctx: IRouterContext) {
-    const allParams = {
+    this.params = _.cloneDeep({
       body: ctx.request.body,
       query: ctx.request.query,
       params: ctx.params,
       header: ctx.request.header
-    }
-
-    this.params = _.cloneDeep(allParams)
-    this.paramsChecked = _.cloneDeep(allParams)
+    })
+    this.paramsChecked = _.cloneDeep(this.params)
   }
 
   /**
@@ -183,33 +180,14 @@ export class BaseValidator {
   }
 
   private _findParam(key: string) {
-    let value
-    value = _.get(this.params, ['query', key])
-    if (value) {
-      return {
-        value,
-        path: ['query', key]
-      }
-    }
-    value = _.get(this.params, ['body', key])
-    if (value) {
-      return {
-        value,
-        path: ['body', key]
-      }
-    }
-    value = _.get(this.params, ['path', key])
-    if (value) {
-      return {
-        value,
-        path: ['params', key]
-      }
-    }
-    value = _.get(this.params, ['header', key])
-    if (value) {
-      return {
-        value,
-        path: ['header', key]
+    const paths = ['query', 'body', 'path', 'header']
+    for (const path of paths) {
+      const value = _.get(this.params, [path, key])
+      if (value) {
+        return {
+          value,
+          path: [path, key]
+        }
       }
     }
     return {
