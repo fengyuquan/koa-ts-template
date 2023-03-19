@@ -23,7 +23,7 @@ export * from './validate-field'
  * 规则二：
  *     可定义自定义的验证方法，方法名需要以validate为方法名前缀。
  *     校验失败时，自定义的校验方法应该抛出错误
- *     校验成功时，必须返回校验后的值。
+ *     校验成功时，不做其他操作，因为内部逻辑是通过执行校验函数，是否捕获错误来判断校验是否成功的。
  *     例如 function validatePassword() {}
  */
 export class BaseValidator {
@@ -123,12 +123,12 @@ export class BaseValidator {
     if (isCustomFunc) {
       // 校验失败时，自定义的校验方法应该抛出错误，通过是否捕获到错误，返回校验结果
       try {
-        const legalValue = await this[key](this.params)
-        ruleResult = createRuleFieldResult(true, '校验成功', legalValue) // 校验成功
+        await this[key](this.params)
+        ruleResult = createRuleFieldResult(true, '校验成功', true) // 校验成功
       } catch (error) {
         ruleResult = createRuleFieldResult(
           false,
-          (error as Error).message || '参数错误'
+          (error as Error).message || `${key} 校验失败`
         )
       }
     } else {
